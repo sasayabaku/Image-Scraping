@@ -7,6 +7,7 @@ import requests
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from random import randint
+import argparse
 
 def random_generate(n):
     range_start = 10**(n-1)
@@ -53,7 +54,11 @@ def listup_image(url, keyword=None):
 
 if __name__ == '__main__':
 
-    url = ""
+    parser = argparse.ArgumentParser(description="Web Page Scraping")
 
+    parser.add_argument('url', help='Page URL')
+    parser.add_argument('--keyword', help="Exclude Keyword", default=None)
 
-    listup_image(url, keyword="")
+    args = parser.parse_args()
+
+    listup_image(args.url, keyword=args.keyword)

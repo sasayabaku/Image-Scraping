@@ -7,9 +7,15 @@ services:
     image: scraping-server
     container_name: scraping-server
 
+    environment:
+      - URL=
+      - KEYWORD=
+
     volumes:
       - ./server/src:/src
 
     working_dir: /src
 
     tty: true
+
+    command: ['/bin/bash', '-c', 'python scraping.py $$URL --keyword $$KEYWORD']
