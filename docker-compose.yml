@@ -13,6 +13,7 @@ services:
 
     volumes:
       - ./server/src:/src
+      - "./server/test:/test"
 
     working_dir: /src
 
