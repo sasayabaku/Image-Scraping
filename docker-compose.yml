@@ -7,6 +7,9 @@ services:
     image: scraping-server
     container_name: scraping-server
 
+    ports:
+      - "9999:9999"
+
     environment:
       - URL=
       - KEYWORD=
@@ -19,4 +22,5 @@ services:
 
     tty: true
 
-    command: ['/bin/bash', '-c', 'python scraping.py $$URL --keyword $$KEYWORD']
+    # command: ['/bin/bash', '-c', 'python scraping.py $$URL --keyword $$KEYWORD']
+    command: ['/bin/bash', '-c', 'uvicorn api_server:app --reload --host 0.0.0.0 --port 9999']
