@@ -1,5 +1,6 @@
 import sys
 sys.path.append('/src/')
+sys.path.append('../src/')
 
 from scraping import listup_image
 
