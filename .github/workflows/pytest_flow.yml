@@ -1,0 +1,38 @@
+name: pytest
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pytest:
+    name: Run pytest
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Python Setup
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix:python-version }}
+
+      - name: Install Library
+        run: |
+          pip install -r server/requirements.txt
+
+      - name: Docker Setup
+        run: |
+          docker compose build
+      
+      - name: Running Pytest
+        run: |
+          cd ./server/test
+          pytest test_scraping.py

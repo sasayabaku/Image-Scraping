@@ -4,9 +4,10 @@ import img2pdf
 from natsort import natsorted
 from PIL import Image
 import requests
+from requests.api import request
 from tqdm import tqdm
 from bs4 import BeautifulSoup
-from random import randint
+from random import randint, random
 import argparse
 
 def random_generate(n):
@@ -15,6 +16,29 @@ def random_generate(n):
     return randint(range_start, range_end)
 
 def listup_image(url, keyword=None):
+
+    tmp_dir = "./tmp"
+    pdf_file = str(random_generate(20)) + '.pdf'
+
+    os.makedirs(tmp_dir, exist_ok=True)
+
+    try:
+        response = requests.get(url)
+    except:
+        return False
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # 画像リスト作成
+    img_list = [{
+        'src': i.attrs['src'], 
+        'alt': i.attrs['alt'] if 'alt' in i.attrs.keys() else None, 
+        'class': i.attrs['class'] if 'class' in i.attrs.keys() else None
+        } for i in soup.select('img')]
+
+    return img_list
+
+def total(url, keyword=None):
 
     tmp_dir = "./tmp"
     pdf_file = str(random_generate(20)) + '.pdf'
@@ -61,4 +85,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    listup_image(args.url, keyword=args.keyword)
+    total(args.url, keyword=args.keyword)
