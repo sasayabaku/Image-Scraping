@@ -5,3 +5,5 @@ SHELL ["/bin/bash", "-c"]
 COPY ./requirements.txt /requirements.txt
 
 RUN pip install -r requirements.txt
+
+RUN pip install fastapi uvicorn
