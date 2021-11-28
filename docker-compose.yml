@@ -18,9 +18,31 @@ services:
       - ./server/src:/src
       - "./server/test:/test"
 
+    networks:
+      - scraping-network
+
     working_dir: /src
 
     tty: true
 
     # command: ['/bin/bash', '-c', 'python scraping.py $$URL --keyword $$KEYWORD']
     command: ['/bin/bash', '-c', 'uvicorn api_server:app --reload --host 0.0.0.0 --port 9999']
+
+  redis:
+    image: redis:6.2.6
+    container_name: redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-volume:/data
+    ports:
+      - 6379:6379
+
+    networks:
+      - scraping-network
+  
+volumes:
+  redis-volume:
+
+networks:
+  scraping-network:
+    name: scraping-network
