@@ -60,16 +60,18 @@ async def get_listup(url: UrlItem):
         "img_list": str_data
     }
 
-@app.get("/generate")
+@app.post("/generate")
 async def generate(item: GenerateItem):
     str_data = redis_connection.get(item.uuid)
     img_list = json.loads(str_data)
+
+    selected_img_list = list(map(int, item.indexes))
 
     tmp_dir = os.path.join('tmp', item.uuid)
     os.makedirs(tmp_dir, exist_ok=True)
 
     i_count = 0
-    for idx in item.indexes:
+    for idx in selected_img_list:
         content = img_list[idx]
         _src = content['src']
 
