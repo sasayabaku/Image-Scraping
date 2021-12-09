@@ -39,6 +39,19 @@ services:
 
     networks:
       - scraping-network
+
+  ### If use Image-Scraping-Web, uncomment below
+  # web:
+  #   build:
+  #     context: ./Image-Scraping-Web
+  #     dockerfile: Dockerfile
+  #   image: scraping-web
+  #   container_name: scraping-web
+
+  #   ports:
+  #     - "3000:3000"
+    
+  #   tty: true
   
 volumes:
   redis-volume:
