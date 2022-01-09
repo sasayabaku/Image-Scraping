@@ -25,7 +25,9 @@ services:
 
     tty: true
 
-    # command: ['/bin/bash', '-c', 'python scraping.py $$URL --keyword $$KEYWORD']
+    depends_on: 
+      - redis
+
     command: ['/bin/bash', '-c', 'uvicorn api_server:app --reload --host 0.0.0.0 --port 9999']
 
   redis:
@@ -41,17 +43,17 @@ services:
       - scraping-network
 
   ### If use Image-Scraping-Web, uncomment below
-  # web:
-  #   build:
-  #     context: ./Image-Scraping-Web
-  #     dockerfile: Dockerfile
-  #   image: scraping-web
-  #   container_name: scraping-web
+  web:
+    build:
+      context: ./Image-Scraping-Web
+      dockerfile: Dockerfile
+    image: scraping-web
+    container_name: scraping-web
 
-  #   ports:
-  #     - "3000:3000"
+    ports:
+      - "3000:3000"
     
-  #   tty: true
+    tty: true
   
 volumes:
   redis-volume:
