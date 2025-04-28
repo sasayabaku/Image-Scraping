@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, File, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
@@ -15,17 +15,26 @@ import img2pdf
 from natsort import natsorted
 from PIL import Image
 
+from icecream import ic
 
 from scraping import listup_image
+from compressPdf import compress_pdf
 
 REDIS_SERVER_NAME = "redis"
+
 
 class UrlItem(BaseModel):
     url: str
 
+
 class GenerateItem(BaseModel):
     uuid: str
     indexes: list
+
+
+class CompressPdfItem(BaseModel):
+    pdffile: object
+
 
 # Fast API Launch
 app = FastAPI()
@@ -37,15 +46,17 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=origins,
-    allow_headers=origins
+    allow_headers=origins,
 )
 
 # Redis Connection
 redis_connection = redis.Redis(host=REDIS_SERVER_NAME, port=6379, db=0)
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 @app.post("/listup")
 async def get_listup(url: UrlItem):
@@ -55,10 +66,8 @@ async def get_listup(url: UrlItem):
 
     redis_connection.set(connection_id, str_data)
 
-    return {
-        "connection_id": connection_id,
-        "img_list": str_data
-    }
+    return {"connection_id": connection_id, "img_list": str_data}
+
 
 @app.post("/generate")
 async def generate(item: GenerateItem):
@@ -67,26 +76,48 @@ async def generate(item: GenerateItem):
 
     selected_img_list = list(map(int, item.indexes))
 
-    tmp_dir = os.path.join('tmp', item.uuid)
+    tmp_dir = os.path.join("tmp", item.uuid)
     os.makedirs(tmp_dir, exist_ok=True)
 
     i_count = 0
     for idx in selected_img_list:
         content = img_list[idx]
-        _src = content['src']
+        _src = content["src"]
 
         img_response = requests.get(_src)
-        save_filepath = os.path.join(tmp_dir, str(i_count) + '.jpg')
+        save_filepath = os.path.join(tmp_dir, str(i_count) + ".jpg")
 
-        open(save_filepath, 'wb').write(img_response.content)
+        open(save_filepath, "wb").write(img_response.content)
 
         i_count = i_count + 1
 
-    pdf_bytes = img2pdf.convert([
-        Image.open(os.path.join(tmp_dir, j))
-            .filename for j in natsorted(os.listdir(tmp_dir)) if j.endswith('jpg')
-        ])
+    pdf_bytes = img2pdf.convert(
+        [
+            Image.open(os.path.join(tmp_dir, j)).filename
+            for j in natsorted(os.listdir(tmp_dir))
+            if j.endswith("jpg")
+        ]
+    )
 
     shutil.rmtree(tmp_dir)
+
+    return Response(content=pdf_bytes, media_type="application/pdf")
+
+
+@app.post("/compress-pdf")
+async def compressPdf(file: UploadFile = File(...)):
+
+    contents = await file.read()
+
+    filename = file.filename
+    content_type = file.content_type
+
+    ic(filename)
+    ic(content_type)
+    ic(len(contents))
+
+    pdf_bytes = compress_pdf(contents)
+
+    ic(len(pdf_bytes))
 
     return Response(content=pdf_bytes, media_type="application/pdf")

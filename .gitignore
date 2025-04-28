@@ -1,4 +1,5 @@
 *.pdf
+!server/test/assets/testpdf.pdf
 
 .DS_Store
 
