@@ -29,7 +29,7 @@ jobs:
 
       - name: Docker Setup
         run: |
-          docker compose build 
+          docker compose build scraping-server redis
           docker compose up -d scraping-server redis
       
       - name: Running Pytest
