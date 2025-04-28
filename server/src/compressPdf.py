@@ -21,11 +21,11 @@ def compress_pdf(input_file, power=0):
 
     pdf_writer.compress_content_streams = True
 
-    for page in pdf_writer.pages:
-        for img in page.images:
-            if hasattr(img, "filter_decodeparms"):
-                if "/ColorTransform" in img.filter_decodeparms:
-                    img.filter_decodeparms["/ColorTransform"] = 1
+    # for page in pdf_writer.pages:
+    #     for img in page.images:
+    #         if hasattr(img, "filter_decodeparms"):
+    #             if "/ColorTransform" in img.filter_decodeparms:
+    #                 img.filter_decodeparms["/ColorTransform"] = 1
 
     output_bytes_stream = io.BytesIO()
     pdf_writer.write(output_bytes_stream)
